@@ -19,6 +19,6 @@ impl CryptoService {
             .hash_non_blocking()
             .compat()
             .await
-            .map_err(|err| eyre!("hashing error: {:?}", err))
+            .map_err(|err| eyre!("Hashing error: {}", err))
     }
 }

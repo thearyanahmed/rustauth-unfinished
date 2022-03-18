@@ -8,12 +8,15 @@ use tracing_subscriber::EnvFilter;
 use tracing::{info, instrument};
 use sqlx::PgPool;
 use std::time::Duration;
+use crate::config::crypto::CryptoService;
+use std::sync::Arc;
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub host: String,
     pub port: i32,
     pub database_url: String,
+    pub secret_key: String,
 }
 
 impl Config {
@@ -44,6 +47,12 @@ impl Config {
             .build(&*self.database_url)
             .await
             .context("creating db connection pool")
+    }
+
+    pub async fn hashing(&self) -> CryptoService {
+        CryptoService {
+            key: Arc::new(self.secret_key.clone())
+        }
     }
 }
 
