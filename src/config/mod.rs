@@ -2,6 +2,8 @@ use color_eyre::Result;
 use eyre::WrapErr;
 use serde::Deserialize;
 use dotenv::dotenv;
+use tracing_subscriber::EnvFilter;
+use tracing::{info, instrument};
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -10,14 +12,21 @@ pub struct Config {
 }
 
 impl Config {
+    #[instrument]
     pub fn from_env() -> Result<Config> {
         dotenv().ok();
 
-        let mut c = config::Config::new();
+        tracing_subscriber::fmt()
+            .with_env_filter(EnvFilter::from_default_env())
+            .init();
 
-        c.merge(config::Environment::default())?;
+        info!("loading config from env.");
 
-        c.try_into()
+        let mut config = config::Config::new();
+
+        config.merge(config::Environment::default())?;
+
+        config.try_into()
             .context("load conf from env")
     }
 }
