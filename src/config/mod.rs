@@ -1,3 +1,5 @@
+pub mod crypto;
+
 use color_eyre::Result;
 use eyre::WrapErr;
 use serde::Deserialize;
