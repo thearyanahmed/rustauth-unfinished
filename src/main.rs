@@ -1,11 +1,12 @@
 mod config;
 mod handlers;
 
+use tracing::info;
 use color_eyre::Result;
-use crate::config::Config;
 use actix_web::{HttpServer, App};
 use actix_web::middleware::Logger;
-use tracing::info;
+
+use crate::config::Config;
 use crate::handlers::app_config;
 
 #[actix_rt::main]
