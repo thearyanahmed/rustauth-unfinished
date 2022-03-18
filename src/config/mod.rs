@@ -4,11 +4,14 @@ use serde::Deserialize;
 use dotenv::dotenv;
 use tracing_subscriber::EnvFilter;
 use tracing::{info, instrument};
+use sqlx::PgPool;
+use std::time::Duration;
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub host: String,
     pub port: i32,
+    pub database_url: String,
 }
 
 impl Config {
@@ -29,4 +32,16 @@ impl Config {
         config.try_into()
             .context("load conf from env")
     }
+
+    #[instrument(skip(self))]
+    pub async fn db_pool(&self) -> Result<PgPool> {
+        info!("creating database connection pool");
+
+        PgPool::builder()
+            .connect_timeout(Duration::from_secs(30))
+            .build(&*self.database_url)
+            .await
+            .context("creating db connection pool")
+    }
 }
+
